@@ -70,3 +70,22 @@ def app(environ, start_response):
     except Exception as e:  # noqa: BLE001
         return _respond(start_response, {'error': str(e)}, 500)
     return _respond(start_response, {'error': 'unknown route'}, 404)
+
+
+def handler(request, context=None):
+    """request/response style entry point; identical dispatch as the WSGI app."""
+    from urllib.parse import urlencode
+    q = getattr(request, 'query', None) or {}
+    flat = {k: (v[0] if isinstance(v, (list, tuple)) else v) for k, v in q.items()}
+    captured = {}
+
+    def start_response(status, headers):
+        captured['status'] = int(status.split()[0])
+        captured['headers'] = dict(headers)
+
+    body = b''.join(app({'QUERY_STRING': urlencode(flat)}, start_response))
+    return {
+        'statusCode': captured.get('status', 200),
+        'headers': captured.get('headers', {}),
+        'body': body.decode('utf-8'),
+    }
