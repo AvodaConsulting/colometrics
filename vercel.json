@@ -1,0 +1,20 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "rewrites": [
+    { "source": "/api/index", "destination": "/api/app?r=index" },
+    { "source": "/api/chapter/:b/:c", "destination": "/api/app?r=chapter&b=:b&c=:c" },
+    { "source": "/api/colometry/:b/:c/:v", "destination": "/api/app?r=colometry&b=:b&c=:c&v=:v" },
+    { "source": "/api/word/:b/:c/:v/:w", "destination": "/api/app?r=word&b=:b&c=:c&v=:v&w=:w" },
+    { "source": "/api/lexicon/:form*", "destination": "/api/app?r=lexicon&form=:form*" },
+    { "source": "/css/:file*", "destination": "/static/css/:file*" },
+    { "source": "/js/:file*", "destination": "/static/js/:file*" },
+    { "source": "/", "destination": "/static/index.html" }
+  ],
+  "functions": {
+    "api/app.py": {
+      "maxDuration": 60,
+      "memory": 512,
+      "includeFiles": "server.py,colometry.py,hebrew.py,morphology.py,sefaria_client.py,book_index.json,morph_data/**"
+    }
+  }
+}

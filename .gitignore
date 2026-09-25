@@ -4,3 +4,4 @@ __pycache__/
 sefaria_cache/
 *.log
 nohup.out
+.vercel

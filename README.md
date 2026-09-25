@@ -9,6 +9,11 @@ Inspired by the public [Colometric Analyzer](https://www.hebraica-digitalia.org/
 (Studia Hebraica Digitalia); text and lexicon are served by the
 [Sefaria API](https://www.sefaria.org).
 
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/AvodaConsulting/colometrics)
+
+One click deploys the app to a free Render web service (sign in with GitHub when
+asked, keep the defaults, confirm — a few minutes later you get a public URL).
+
 ## Run
 
 ```bash
