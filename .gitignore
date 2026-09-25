@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+.DS_Store
+sefaria_cache/
+*.log
+nohup.out

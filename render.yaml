@@ -1,0 +1,7 @@
+# Render.com deployment — free tier (sleeps after ~15 min idle, cold start ~30s)
+services:
+  - type: web
+    name: colometrics
+    runtime: docker
+    plan: free
+    healthCheckPath: /api/index

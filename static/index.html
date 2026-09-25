@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Colometrics — Masoretic Colometry of the Hebrew Bible</title>
+  <link rel="icon" href="data:,">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Ezra+SIL&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="site-title" href="#/">Colometrics</a>
+    <nav id="site-nav">
+      <a href="#/analyzer" data-nav="analyzer">Colometric Analyzer</a>
+      <a href="#/reader" data-nav="reader">Reader</a>
+      <a href="#/about" data-nav="about">About</a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <!-- ============ ANALYZER ============ -->
+    <section id="view-analyzer" class="view" hidden>
+      <p class="breadcrumb">Study <span class="sep">›</span> <span class="current">Colometric Analyzer</span></p>
+      <h1 class="page-title">Colometric Analyzer</h1>
+
+      <div class="toolbar">
+        <select id="sv-book" class="sel sel-book" aria-label="Book"><option value="">Book…</option></select>
+        <select id="sv-chapter" class="sel sel-narrow" aria-label="Chapter" disabled><option value="">Chapter…</option></select>
+        <select id="sv-verse" class="sel sel-narrow" aria-label="Verse" disabled><option value="">Verse…</option></select>
+        <button id="sv-ok" class="btn btn-primary" disabled>OK</button>
+        <span class="nav-arrows">
+          <button id="sv-prev" class="btn btn-nav" disabled aria-label="Previous verse">←</button>
+          <button id="sv-next" class="btn btn-nav" disabled aria-label="Next verse">→</button>
+        </span>
+        <label class="en-toggle"><input type="checkbox" id="sv-en-toggle"> Translation</label>
+      </div>
+
+      <div class="mode-row">
+        <span class="mode-label">Colometric view according to Masoretic accents:</span>
+        <label><input type="radio" name="sv-mode" value="none" checked> No colometry</label>
+        <label><input type="radio" name="sv-mode" value="poetry"> Poetry</label>
+        <label><input type="radio" name="sv-mode" value="prose"> Prose</label>
+      </div>
+
+      <div class="verse-head">
+        <span id="sv-ref" class="verse-ref"></span>
+        <span id="sv-badge" class="poetic-badge" hidden>poetic accent system (sifre emet)</span>
+      </div>
+      <div class="verse-box">
+        <div id="sv-verse-text" class="heb" dir="rtl" lang="he"></div>
+        <div id="sv-verse-placeholder" class="placeholder">Select a book, chapter and verse.</div>
+      </div>
+      <div id="sv-english" class="english" dir="ltr" lang="en" hidden></div>
+      <p class="hint">Click any word — or a prefix / suffix / the word between them — for its accents, parsing and lexicon entry.</p>
+      <div id="sv-word-panel" class="word-panel"></div>
+    </section>
+
+    <!-- ============ READER ============ -->
+    <section id="view-reader" class="view" hidden>
+      <p class="breadcrumb">Read <span class="sep">›</span> <span class="current" id="read-crumb">Accented text</span></p>
+      <h1 class="page-title" id="read-title">Accented text</h1>
+      <div class="toolbar">
+        <select id="read-book" class="sel sel-book" aria-label="Book"></select>
+        <select id="read-chapter" class="sel sel-narrow" aria-label="Chapter"></select>
+        <span class="nav-arrows">
+          <button id="read-prev" class="btn btn-nav" aria-label="Previous chapter">←</button>
+          <button id="read-next" class="btn btn-nav" aria-label="Next chapter">→</button>
+        </span>
+        <select id="read-mode" class="sel" aria-label="Text mode">
+          <option value="accented">Accented text</option>
+          <option value="unaccented">Unaccented text</option>
+          <option value="consonantal">Consonantal text</option>
+          <option value="translit">Transliterated text</option>
+        </select>
+        <label class="en-toggle"><input type="checkbox" id="read-en-toggle"> Translation</label>
+      </div>
+      <div id="read-text" class="heb read-text" dir="rtl" lang="he"></div>
+      <div id="read-english" dir="ltr" lang="en" hidden></div>
+    </section>
+
+    <!-- ============ ABOUT ============ -->
+    <section id="view-about" class="view" hidden>
+      <p class="breadcrumb">Help <span class="sep">›</span> <span class="current">About</span></p>
+      <h1 class="page-title">About</h1>
+      <div class="prose">
+        <p><strong>Colometrics</strong> is a study tool for the Tanakh in the original language.
+        It displays the biblical text with the Masoretic cantillation accents (teʿamim) and
+        divides each verse into <em>cola</em> — prosodic lines — according to the classical
+        Tiberian accent hierarchy of Wickes (1881, 1887) and Park (2020).</p>
+
+        <h2>Colometric Analyzer</h2>
+        <p>Choose a book, chapter and verse, then pick a colometric view. The teʿamim are a
+        hierarchical system: the disjunctive accents (mafsikim) close prosodic units of
+        different ranks. The <em>Poetry</em> and <em>Prose</em> views apply the accent
+        hierarchy of the poetic books (Psalms, Job, Proverbs) or of the twenty-one prose
+        books respectively, so any verse can be examined under either system. Click a word
+        to see the name and role of its accent sign(s); where a sign only exists in
+        combination — <em>legarmeh</em> (an accent + paseq), <em>reviʿa mugrash</em>
+        (geresh muqdam + revia), <em>ʿole we-yored</em> — the compound is identified.</p>
+
+        <h2>Reader</h2>
+        <p>Read any chapter in four forms: fully accented (Miqra according to the Masorah),
+        unaccented (vowel points only), consonantal (letters only), or scholarly
+        transliteration, with an optional English translation (JPS) in parallel.</p>
+
+        <h2>Word study</h2>
+        <p>Every word is segmented into its morphemes (conjunctions, prepositions,
+        the article, pronominal suffixes) and each morpheme carries its parsing —
+        stem, conjugation, person, gender, number, state — from the Open Scriptures
+        Hebrew Bible morphology. Click a morpheme for a quick lexicon lookup of that
+        part. The word's <em>Brown–Driver–Briggs</em> entry (via Sefaria's
+        “BDB Augmented Strong” lexicon) appears in a compact abridged form; a button
+        reveals the full unabridged BDB article with all its scriptural citations.</p>
+
+        <h2>Sources &amp; licenses</h2>
+        <ul>
+          <li>Hebrew text: <em>Miqra according to the Masorah</em> (MAM, Aleppo-Codex based),
+              via the <a href="https://www.sefaria.org" target="_blank" rel="noopener">Sefaria API</a> (CC-BY-SA).</li>
+          <li>English: <em>The JPS Tanakh</em> (Jewish Publication Society), via Sefaria.</li>
+          <li>Lexicon: BDB Augmented Strong, via Sefaria.</li>
+          <li>Colometry: implemented from the classical accent hierarchy
+              (W. Wickes, <em>A Treatise on the Accentuation…</em>, 1881/1887;
+              S. J. Park, <em>The Fundamentals of Hebrew Accents</em>, 2020),
+              and cross-checked against the public
+              <a href="https://www.hebraica-digitalia.org/" target="_blank" rel="noopener">Colometric Analyzer</a>
+              (Studia Hebraica Digitalia).</li>
+          <li>Word parsing: <a href="https://github.com/openscriptures/morphhb" target="_blank" rel="noopener">Open Scriptures Hebrew Bible</a>
+              morphology (Westminster Leningrad Codex, CC-BY 4.0), aligned to the
+              displayed text by consonantal form.</li>
+        </ul>
+
+        <h2>Technical notes</h2>
+        <p>The application is a small Python server (standard library only) with a static
+        frontend; Sefaria API responses are cached on disk in <code>sefaria_cache/</code>.
+        U+05BD is read as silluq on the verse-final word and as meteg (gaʿya) elsewhere.
+        In the poetic books the character named ZARQA in Unicode (U+0598) is the conjunctive
+        tsinnorit and ZINOR (U+05AE) the disjunctive, per Unicode Technical Note #27.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>Colometrics — a local study tool · Hebrew text, translation and lexicon via the Sefaria API · Built for research and study</p>
+  </footer>
+
+  <script src="/js/app.js"></script>
+</body>
+</html>
