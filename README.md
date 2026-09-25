@@ -77,6 +77,22 @@ in the poetic books.
 The app is a single stdlib-Python process with no dependencies — any host that
 can run a container (or Python 3.11+) works.
 
+### Vercel (serverless, never sleeps)
+
+Vercel has no long-running processes, so `api/app.py` is a small WSGI adapter
+that dispatches to the same pure API functions as `server.py`; `vercel.json`
+rewrites the app's REST paths onto it and serves `static/` directly:
+
+```sh
+vercel login     # once: email verification code, no card needed
+vercel --prod    # from the repo root; prints the public URL
+```
+
+Each cold start loads the bundled `book_index.json` (instant) and fetches
+Sefaria data on demand (60 s function ceiling, typically 1–3 s); within a warm
+instance the on-disk cache in `/tmp` keeps repeat visits fast. Static assets
+and the frontend are served from the edge, not through the function.
+
 ### Render.com (free tier)
 
 1. Push this repository to GitHub (`git remote add origin … && git push`).
