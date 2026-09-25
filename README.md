@@ -67,6 +67,38 @@ elsewhere; per Unicode Technical Note #27, the character named ZARQA (U+0598)
 is treated as the conjunctive tsinnorit and ZINOR (U+05AE) as the disjunctive
 in the poetic books.
 
+## Deploy
+
+The app is a single stdlib-Python process with no dependencies — any host that
+can run a container (or Python 3.11+) works.
+
+### Render.com (free tier)
+
+1. Push this repository to GitHub (`git remote add origin … && git push`).
+2. In the Render dashboard: **New → Web Service** → pick the repo. Render
+   auto-detects `render.yaml` + `Dockerfile` (or choose Docker manually).
+3. Leave everything default (free plan) and deploy. The app listens on
+   `0.0.0.0:$PORT` as required; `book_index.json` makes startup instant, and
+   Sefaria data is fetched on demand (a writable disk caches it; a read-only
+   disk works too, just always fetches).
+
+Note: the free tier **sleeps after ~15 minutes without traffic** and restarts
+on the next request (cold start ≈ 30 s including the first Sefaria fetch).
+
+### Any Docker host
+
+```sh
+docker build -t colometrics .
+docker run -p 8654:10000 -e HOST=0.0.0.0 colometrics
+# open http://localhost:8654
+```
+
+### Local (no Docker)
+
+```sh
+python3 server.py        # http://localhost:8654
+```
+
 ## Files
 
 | File | Role |
