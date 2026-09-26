@@ -63,7 +63,7 @@ def app(environ, start_response):
                 return _respond(start_response, {'error': 'not found'}, 404)
             return _respond(start_response, data)
         if r == 'lexicon':
-            data = server.api_lexicon(one('form'))
+            data = server.api_lexicon(one('form'), one('strong'), one('alt'))
             if isinstance(data, tuple):
                 return _respond(start_response, data[0], data[1])
             return _respond(start_response, data)

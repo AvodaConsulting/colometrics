@@ -286,7 +286,13 @@
       return;
     }
     try {
-      const res = await fetch(`/api/lexicon/${encodeURIComponent(m.t)}`);
+      // pass the OSHB Strong number and the whole word: a bare stem (רֹעִ of
+      // רֹעִי) would otherwise surface the wrong lexeme (רַע "evil")
+      const lm = (m.lm || '').match(/\d+/);
+      const qs = new URLSearchParams();
+      if (lm) qs.set('strong', lm[0]);
+      qs.set('alt', w.t);
+      const res = await fetch(`/api/lexicon/${encodeURIComponent(m.t)}?${qs}`);
       const data = await res.json();
       renderPartLexicon($('wp-part-lex'), m.t, data);
     } catch (e) {
@@ -498,7 +504,11 @@
           const m = info.morphemes[i];
           lookupBox.innerHTML = '<div class="morph-lookup loading">Loading…</div>';
           try {
-            const res = await fetch(`/api/lexicon/${encodeURIComponent(m.t)}`);
+            const lm = (m.lemma || '').match(/\d+/);
+            const qs = new URLSearchParams();
+            if (lm) qs.set('strong', lm[0]);
+            qs.set('alt', info.token);
+            const res = await fetch(`/api/lexicon/${encodeURIComponent(m.t)}?${qs}`);
             const data = await res.json();
             renderMorphLookup(lookupBox, m, data);
           } catch (e) {

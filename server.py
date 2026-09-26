@@ -85,9 +85,25 @@ def word_info(book_id, ch, v, word_idx):
                         'role': meta[2] if meta else ''})
     unpointed = hebrew.consonantal(tok.text)
     lookup_form = hebrew.unaccented(tok.text)
+    # the lexeme the morphology points at: last Strong-numbered lemma among
+    # the morphemes (clitics carry letter codes, suffixes repeat the stem's)
+    core_strong = ''
+    numeric = [x['lemma'] for x in morphemes if re.match(r'\d', x.get('lemma') or '')]
+    if numeric:
+        m_strong = re.match(r'\d+', numeric[-1])
+        core_strong = m_strong.group(0) if m_strong else ''
     entries = sf.lexicon_lookup(lookup_form)
-    bdb = next((e for e in entries if 'BDB' in e['lexicon'] and 'Augmented' in e['lexicon']), None)
-    bdb_full = next((e for e in entries if e['lexicon'] == 'BDB Dictionary'), None)
+    bdb = next((e for e in entries if 'BDB' in e['lexicon'] and 'Augmented' in e['lexicon']
+                and core_strong and e['strong'] == core_strong), None)
+    if bdb is None:
+        bdb = next((e for e in entries if 'BDB' in e['lexicon'] and 'Augmented' in e['lexicon']), None)
+    bdb_full = next((e for e in entries if e['lexicon'] == 'BDB Dictionary'
+                     and core_strong and e['strong'] == core_strong), None)
+    if bdb_full is None and bdb:
+        bdb_full = next((e for e in entries if e['lexicon'] == 'BDB Dictionary'
+                         and e['headword'] == bdb['headword']), None)
+    if bdb_full is None:
+        bdb_full = next((e for e in entries if e['lexicon'] == 'BDB Dictionary'), None)
     return {
         'token': tok.text, 'trailer': tok.trailer, 'position': idx,
         'unpointed': unpointed,
@@ -106,22 +122,40 @@ def word_info(book_id, ch, v, word_idx):
     }
 
 
-def api_lexicon(form: str):
+def api_lexicon(form: str, strong: str = '', alt: str = ''):
     form = hebrew.strip_html(form).strip()
     if not form or len(form) > 60:
         return {'error': 'bad form'}, 400
-    unpointed = hebrew.consonantal(form)
-    # prefer the pointed form (if vowels were given), else the consonantal one
-    pointed = form if any(c in hebrew.POINT_CHARS for c in form) else None
+    # look up the form itself and, when given, the whole word it was segmented
+    # from — a bare stem (רֹעִ from רֹעִי) often surfaces the wrong lexeme
+    forms = []
+    for src in (form, alt):
+        src = hebrew.strip_html(src).strip()
+        if not src:
+            continue
+        pointed = src if any(c in hebrew.POINT_CHARS for c in src) else None
+        for f in [pointed, hebrew.consonantal(src)]:
+            if f and f not in forms:
+                forms.append(f)
     seen = set()
     merged = []
-    for f in [pointed, unpointed]:
-        if not f or f in seen:
-            continue
-        seen.add(f)
+    for f in forms:
         for e in sf.lexicon_lookup(f):
-            if e['headword'] + e['lexicon'] not in {x['headword'] + x['lexicon'] for x in merged}:
+            if e['headword'] + e['lexicon'] not in seen:
+                seen.add(e['headword'] + e['lexicon'])
                 merged.append(e)
+    # prefer the lexeme the morphology actually points to (OSHB Strong number)
+    m = re.match(r'\d+', strong or '')
+    strong = m.group(0) if m else ''
+    if strong:
+        heads = {e['headword'] for e in merged if e['strong'] == strong}
+        def rank(e):
+            if e['strong'] == strong:
+                return 0
+            if e['lexicon'] == 'BDB Dictionary' and e['headword'] in heads:
+                return 1
+            return 2
+        merged.sort(key=rank)  # stable: only promotes matches, keeps order otherwise
     return {'form': form, 'entries': merged}
 
 
@@ -160,7 +194,7 @@ def api_colometry(book_id, ch, v, mode):
             for i, x in enumerate(mm):
                 kind = 'suffix' if x['morph'].startswith('S') else ('core' if i == core else 'prefix')
                 packed.append({'t': x['t'], 's': x['short'], 'l': x['long'],
-                               'g': x['clitic'], 'k': kind})
+                               'g': x['clitic'], 'k': kind, 'lm': x['lemma']})
             morph_by_pos[idx] = packed
     out = []
     for colon in cola:
@@ -220,7 +254,7 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json(data)
             m = re.fullmatch(r'/api/lexicon/(.+)', path)
             if m:
-                data = api_lexicon(m.group(1))
+                data = api_lexicon(m.group(1), qs.get('strong', [''])[0], qs.get('alt', [''])[0])
                 if isinstance(data, tuple):
                     return self._json(*data)
                 return self._json(data)
