@@ -127,22 +127,26 @@ def api_lexicon(form: str, strong: str = '', alt: str = ''):
     if not form or len(form) > 60:
         return {'error': 'bad form'}, 400
     # look up the form itself and, when given, the whole word it was segmented
-    # from — a bare stem (רֹעִ from רֹעִי) often surfaces the wrong lexeme
+    # from — a bare stem (רֹעִ from רֹעִי) often surfaces the wrong lexeme.
+    # Sefaria's /api/words matches the voweled-but-uncantillated form best;
+    # the raw form with te'amim can miss entries (e.g. עֲצַת → 6098).
     forms = []
     for src in (form, alt):
         src = hebrew.strip_html(src).strip()
         if not src:
             continue
-        pointed = src if any(c in hebrew.POINT_CHARS for c in src) else None
-        for f in [pointed, hebrew.consonantal(src)]:
+        for f in [hebrew.unaccented(src), hebrew.consonantal(src)]:
             if f and f not in forms:
                 forms.append(f)
     seen = set()
     merged = []
     for f in forms:
         for e in sf.lexicon_lookup(f):
-            if e['headword'] + e['lexicon'] not in seen:
-                seen.add(e['headword'] + e['lexicon'])
+            # strong number is part of the identity: homograph lexemes share a
+            # headword and lexicon but differ by Strong number (עֵצָה 6097/6098)
+            key = e['headword'] + '|' + e['lexicon'] + '|' + e['strong']
+            if key not in seen:
+                seen.add(key)
                 merged.append(e)
     # prefer the lexeme the morphology actually points to (OSHB Strong number)
     m = re.match(r'\d+', strong or '')
